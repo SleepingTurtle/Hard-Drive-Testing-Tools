@@ -2,30 +2,32 @@
 
 #Runs through SmartCtl Hard Drive Test
 
-
-#Makes the Serial Number the File Header 
+#Outputs the
+echo 
 serial=`smartctl -i $1 | awk -F: '($1 ~ /Serial/){ print $2 } '` 
 smartctl -i $1 >> $serial.txt
-echo $serial
+echo Drive Serial: $serial
+echo
 
 #Does a Health Test
+health=`smartctl -H $1 | awk -F: '($1 ~ '/SMART/') { print $2 }'`
 smartctl -H $1 >> $serial.txt
+echo Drive Health: $health
 
-#Runs SHORT tests 
-smartctl -t short $1
+smartctl -t short $1 > /dev/null
+
+wait=`smartctl -t short /dev/sdd | awk '($1 ~ '/Please/') { print $3}'`
 echo
-echo Wait until first test is done then press [Enter]
+echo The test will resume in $wait minute
+sleep $wait'm'
 
-read line
-
-smartctl -t short $1
+smartctl -t short $1 > /dev/null
+echo Results will print in $wait minute
 echo
-echo Second test is starting wait until complete
-
-read line2
+sleep $wait'm'
 
 #Outputs the results of the test
 smartctl -l selftest $1 >> $serial.txt
 
 #Shows final output
-cat $serial.txt
+tail $serial.txt
