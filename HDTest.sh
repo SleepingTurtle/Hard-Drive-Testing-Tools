@@ -18,7 +18,7 @@ echo Drive Health: $health
 smartctl -t short $1 > /dev/null
 
 #Waits for the first test to complete
-wait=`smartctl -t short /dev/sdd | awk '($1 ~ '/Please/') { print $3 }'`
+wait=`smartctl -t short $1 | awk '($1 ~ '/Please/') { print $3 }'`
 echo
 echo The test will resume in $wait minute
 sleep $wait'm'
